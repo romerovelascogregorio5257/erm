@@ -12,8 +12,6 @@ import Profile from "../views/user/Profile.vue"
 import CrudTest from "../views/system/test/CrudTest.vue"
 import Checkpoint from "../views/erm/checkpoint/report/detail/Main.vue";
 import Dashboard from "../views/erm/checkpoint/report/dashboard/Main.vue";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
 
 const authStore = useAuthStore(pinia)
 const userStore = useUserStore(pinia)
@@ -154,63 +152,51 @@ const router = createRouter({
     },
 });
 
-const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const removeListener = onAuthStateChanged(
-      getAuth(),
-        (user) => {
-          removeListener();
-          resolve(user);
-        },
-      reject
-    );
-  });
-};
-
 router.beforeEach(async (to, from, next) => {
-    if (await getCurrentUser()) {
-      if (authStore.authData.token === '') {
-          const authData = JSON.parse(localStorage.getItem('authData'))
-          if (authData) {
-              authStore.saveTokenData({
-                  accessToken: localStorage.getItem('access_token'),
-                  refreshToken: localStorage.getItem('refresh_token'),
-                  expiresIn : localStorage.getItem('token_expiration'),
-                  user : {
-                      uid: authData.uid,
-                      email : authData.email,
-                      providerId: authData.providerId,
-                      metadata : authData.metadata
-                  },
-                  auth : localStorage.getItem('authData')
-              })
+    if (authStore.authData.token === '') {
+      console.log('uno');
 
-              authStore.setIsAuthenticated(true)
-          }
-      }
+        const authData = JSON.parse(localStorage.getItem('authData'))
+        if (authData) {
+          console.log('dos');
+            authStore.saveTokenData({
+                accessToken: localStorage.getItem('access_token'),
+                refreshToken: localStorage.getItem('refresh_token'),
+                expiresIn : localStorage.getItem('token_expiration'),
+                user : {
+                    uid: authData.uid,
+                    email : authData.email,
+                    providerId: authData.providerId,
+                    metadata : authData.metadata
+                },
+                auth : localStorage.getItem('authData')
+            })
 
-      if (!authStore.isTokenAlive && authStore.authData.refreshToken !== '') {
-          authStore.refreshToken({
-              "grant_type": 'refresh_token',
-              "refresh_token": authStore.authData.refreshToken
-          })
+            authStore.setIsAuthenticated(true)
+        }
+    }
 
-      }
-      }
+    if (!authStore.isTokenAlive && authStore.authData.refreshToken !== '') {
+      console.log('get');
+        authStore.refreshToken({
+            "grant_type": 'refresh_token',
+            "refresh_token": authStore.authData.refreshToken
+        })
 
-      if (!authStore.isAuthenticated && to.meta.requiresAuth) {
-          return next({name: 'login'})
-      }
+    }
 
-      if(to.name === 'login' && authStore.isAuthenticated){
-          return next({name: 'home'})
-      }
-      return next()
+    if (!authStore.isAuthenticated && to.meta.requiresAuth) {
+      console.log('lol');
 
+        return next({name: 'login'})
+    }
 
+    if(to.name === 'login' && authStore.isAuthenticated){
+      console.log('lasa');
 
-
-
+        return next({name: 'home'})
+    }
+    return next()
 })
 
 export default router;

@@ -12,8 +12,6 @@ import {
     signInWithEmailAndPassword,
     updatePassword,
     signOut,
-    linkWithPopup,
-    getAuth,
 } from "firebase/auth"
 
 export const useAuthStore = defineStore("auth", {
@@ -110,41 +108,6 @@ export const useAuthStore = defineStore("auth", {
                             })
                         })
                 })
-            },
-            signInWithGoogle: function () {
-                return new Promise(async (resolve, reject) => {
-                    const provider = new GoogleAuthProvider(auth)
-                    await signInWithPopup(auth, provider)
-                        .catch(error => {
-                            reject(error)
-                        })
-                        .then(async (response) => {
-                            const user = useUserStore()
-                            await user.user(response.user.uid).then(() => {
-                                const userData = user.userData
-                                const darkModeStore = useDarkModeStore()
-                                darkModeStore.setDarkMode(userData.dark_mode)
-                                resolve(true)
-                            })
-                        })
-                })
-            },
-            linkGoogle: function () {
-              return new Promise(async (resolve, reject) => {
-                const provider = new GoogleAuthProvider();
-                // const authDataCap = JSON.parse(localStorage.getItem('user_cap'));
-                const auth = getAuth();
-
-                await linkWithPopup(auth.currentUser, provider).then((result) => {
-                  // Accounts successfully linked.
-                  const credential = GoogleAuthProvider.credentialFromResult(result);
-                  const user = result.user;
-                  // ...
-                }).catch((error) => {
-                  // Handle Errors here.
-                  // ...
-                });
-              })
             },
             logout: function () {
                 const router = useRouter()

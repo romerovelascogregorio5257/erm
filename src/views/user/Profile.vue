@@ -43,7 +43,7 @@
               <!--Le quite <button-->
               <a href="javascript:void(0)"
                   id="link-with-google"
-                 class=" btn btn-outline-secondary py px w-full xl:mt-0 align-top " @click="linkGoogle()">
+                 class=" btn btn-outline-secondary py px w-full xl:mt-0 align-top " @click="link">
                 <img
                     alt=""
                     class="mr-3 pl-1 h-5 w-6 "
@@ -137,7 +137,7 @@ import dom from "@left4code/tw-starter/dist/js/dom";
 import {useUserStore} from "@/stores/user";
 import {useAuthStore} from "@/stores/auth";
 import Toastify from "toastify-js";
-import {GoogleAuthProvider, linkWithPopup, OAuthProvider} from "firebase/auth";
+import {GoogleAuthProvider, linkWithPopup, OAuthProvider, getAuth} from "firebase/auth";
 
 const user = ref([])
 const userStore = useUserStore()
@@ -160,36 +160,35 @@ const changeUserDarkMode = (darkMode) => {
     console.log(err)
   })
 }
+const link = () =>{
 
-// const linkGoogle = async () => {
-//   const provider = new GoogleAuthProvider();
-//   const result = await linkWithPopup(auth.currentUser, provider);
-//
-// // The signed-in user info.
-//   const user = result.user;
-// // This gives you a Google Access Token.
-//   const credential = provider.credentialFromResult(auth, result);
-//   const token = credential.accessToken;
-//
-// }
+  const provider = new GoogleAuthProvider();
 
-const linkGoogle = async () => {
-  const auth = useAuthStore()
-  await auth.linkGoogle()
-      .then(response => {
-        if (auth.isAuthenticated === true) {
-          // loginSuccessMessage()
-          // router.push("/")
-          console.log('se ha loguear');
-        }
-      }).catch(err => {
-        // loginGoogleBtn.value.finishLoading()
-        console.log(err)
-      })
+  const auth = getAuth();
+  linkWithPopup(auth.currentUser, provider).then((result) => {
+    // Accounts successfully linked.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const user = result.user;
+    // ...
+  }).catch((error) => {
+    // Handle Errors here.
+    // ...
+  });
 }
 
 const providerIsFirebase = computed(() => user.value.providerId === 'firebase' || !user.value.providerId)
 
+const linkGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  const result = await linkWithPopup(auth.currentUser, provider);
+
+// The signed-in user info.
+  const user = result.user;
+// This gives you a Google Access Token.
+  const credential = provider.credentialFromResult(auth, result);
+  const token = credential.accessToken;
+
+};
 
 const photoUpdateSuccessMessage = () => {
   Toastify({

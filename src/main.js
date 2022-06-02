@@ -22,9 +22,6 @@ const authStore = useAuthStore(pinia)
 app.mount("#app")
 
 auth.onAuthStateChanged(user => {
-  console.log(user,'user capturado');
-  localStorage.setItem("user_cap", JSON.stringify(user));
-
     if (user !== null) {
         const tokenData = {
             accessToken: user.accessToken,
@@ -40,8 +37,6 @@ auth.onAuthStateChanged(user => {
         }
         authStore.setIsAuthenticated(true)
         authStore.saveTokenData(tokenData)
-
-        console.log(localStorage,'close');
 
     }
 })
